@@ -1,0 +1,22 @@
+version: "3"
+services:
+  node:
+    container_name: node
+    image: jmank88/geth
+    ports:
+      - "30303:30303"
+      - "30303:30303/udp"
+      # proxy
+      - "80:80"      
+    volumes:
+      - /home/{{USERNAME}}:/geth
+    command: --config /geth/config.toml --rpc --metrics --pprof
+    restart: always
+  proxy:
+    container_name: proxy
+    image: gochain/rpc-proxy:latest
+    depends_on:
+      - node
+    network_mode: "service:node"
+    command: -port 80 -url http://localhost:8545 -allow "eth_call,eth_blockNumber,eth_getBalance,eth_sendRawTransaction,eth_gasPrice,net_version,eth_getTransaction,eth_getTransactionReceipt,eth_getTransactionCount,eth_getFilterChanges,net_listening,eth_getBlockByHash,eth_uninstallFilter,eth_getBlockByNumber,eth_newBlockFilter,eth_newPendingTransactionFilter,eth_blockNumber,eth_totalSupply" -rpm 1000
+    restart: always

@@ -1,0 +1,12 @@
+version: "3"
+services:
+  node:
+    container_name: node
+    image: jmank88/geth
+    ports:
+      - "30303:30303"
+      - "30303:30303/udp"
+    volumes:
+      - /home/{{USERNAME}}:/home/{{USERNAME}}
+    command: --config /home/{{USERNAME}}/config.toml --rpc --metrics --pprof --unlock 0x{{ACCOUNT_ID}} --datadir /home/{{USERNAME}}/node --password /home/{{USERNAME}}/password.txt --mine
+    restart: always

@@ -1,0 +1,19 @@
+---
+- import_playbook: library/install_docker.yml
+- import_playbook: library/init_geth.yml
+- hosts: proxy
+  tasks:
+  - name: Configuring docker-compose.yml
+    template:
+        src: templates/{{template_folder}}/docker-compose-proxy.yml.j2
+        dest: /root/docker-compose.yml
+
+  - name: Init geth node with genesis
+    shell: "docker run -v $PWD:/root jmank88/geth --datadir /root/node init /root/genesis.json"    
+    failed_when: false
+  
+  - name: Copy config.toml for get
+    template:
+        src: ../templates/{{template_folder}}/config.toml.j2
+        dest: /root/config.toml
+- import_playbook: library/configure_run_updater.yml

@@ -1,0 +1,41 @@
+---
+- hosts: all
+  become: true
+  tasks:
+  - copy:
+      src: ../templates/{{template_folder}}/node/
+      dest: /home/{{USERNAME}}  
+  # Checking geth container status
+  - name: Get node container status
+    shell: docker ps -a -f name=node --format {%raw%}"table {{.Status}}"{%endraw%} | awk 'FNR == 2 {print}' | awk '{print $1}'
+    register: geth_running
+    changed_when: false
+    failed_when: false
+    check_mode: no
+
+# Geth is NOT running so create account and init it
+  - name: Creating account if node is not running yet
+    shell: "docker run -v /home/{{USERNAME}}:/home/{{USERNAME}} jmank88/geth --datadir /home/{{USERNAME}}/node --password /home/{{USERNAME}}/password.txt account new | awk -F '[{}]' '{print $2}' "
+    register: create_account_output
+    when: geth_running.stdout == ""
+  
+  - set_fact:
+      ACCOUNT_ID: "{{ create_account_output.stdout }}"
+    when: geth_running.stdout == ""
+
+# Geth IS running block
+  - name: Getting account from running node
+    shell:  pgrep  -a -f geth
+    register: account_id_output
+    when: geth_running.stdout != ""
+    check_mode: no
+
+  - set_fact:
+      ACCOUNT_ID: "{{ account_id_output.stdout | regex_search(regexp,'\\1') | list | first }}"
+    vars:
+      regexp: '--unlock (?:0x)?(.+) --password'
+    when: geth_running.stdout != "" and account_id_output.stdout != "" and account_id_output.stdout | search("unlock") # geth IS running
+  
+  - debug:
+      msg: "{{ ACCOUNT_ID }}"
+    # when: ACCOUNT_ID is defined

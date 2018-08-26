@@ -1,0 +1,11 @@
+---
+- hosts: all
+  become: true
+  tasks:
+  - name: Trying to stop old docker-compose if exist
+    shell: docker-compose down --remove-orphans
+    changed_when: false
+    failed_when: false
+
+  - name: Restarting docker-compose.
+    shell: docker-compose down && docker-compose up -d

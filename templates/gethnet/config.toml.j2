@@ -1,0 +1,22 @@
+[Eth]
+NetworkId = {{NetworkId}}
+
+[Eth.TxPool]
+NoLocals = true
+
+[Node]
+DataDir = "/geth/node"
+HTTPModules = ["net", "web3", "eth", "shh"]
+WSModules = ["net", "web3", "eth", "shh"]
+
+[Node.P2P]
+StaticNodes = [
+  {% for item in groups['gethnodes'] %}
+    "{{hostvars[item]['enode_from_host']}}",
+  {% endfor %}
+]
+TrustedNodes = [
+  {% for item in groups['gethnodes'] %}
+    "{{hostvars[item]['enode_from_host']}}",
+  {% endfor %}
+]
