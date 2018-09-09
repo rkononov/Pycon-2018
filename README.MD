@@ -39,19 +39,19 @@ Edit config/hosts.ansible file, configure list of servers you watn to operate (i
 Dry run without any changes (but it will show you the changes) on node5 (list of available hosts is in hosts.ansible file)
 
 ```bash
-  ansible-playbook --limit=gethnode5 node.yml --diff --check
+  ansible-playbook --limit=gethnode5 geth_node.yml --diff --check
 ```
 
 Applying changes to selected host (node5)
 
 ```bash
-  ansible-playbook --limit=gethnode5 node.yml --diff
+  ansible-playbook --limit=gethnode5 geth_node.yml --diff
 ```
 
 Or if you want to update all devnodes
 
 ```bash
-  ansible-playbook --limit=gethnodes node.yml --diff --check
+  ansible-playbook --limit=gethnodes geth_node.yml --diff --check
 ```
 
 
